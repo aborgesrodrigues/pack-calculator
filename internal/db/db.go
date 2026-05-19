@@ -1,13 +1,15 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"log/slog"
 	"os"
+	"pack-calculator/internal/common"
 
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 var errDuplicatedEvent = errors.New("error inserting duplicated event")
@@ -18,6 +20,8 @@ type DB struct {
 }
 
 type DBInterface interface {
+	ClearPackSize(ctx context.Context) error
+	SavePackSize(ctx context.Context, packSizeBatch *common.PackSizeBatch) error
 }
 
 func NewDB(logger *slog.Logger) (*DB, error) {
@@ -39,4 +43,28 @@ func NewDB(logger *slog.Logger) (*DB, error) {
 		logger: logger,
 		db:     db,
 	}, nil
+}
+
+func (db *DB) ClearPackSize(ctx context.Context) error {
+	_, err := db.db.ExecContext(
+		ctx,
+		`	
+			DELETE FROM pack_size;
+		`,
+	)
+
+	return err
+}
+
+func (db *DB) SavePackSize(ctx context.Context, packSizeBatch *common.PackSizeBatch) error {
+	_, err := db.db.ExecContext(
+		ctx,
+		`	
+			INSERT INTO public.pack_size(size)
+        	SELECT unnest($1::int[])
+		`,
+		pq.Array(packSizeBatch.Sizes),
+	)
+
+	return err
 }

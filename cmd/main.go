@@ -18,7 +18,7 @@ func main() {
 
 	// add routes
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /health", handler.Health)
+	mux.HandleFunc("POST /pack_size/batch", handler.SavePackSize)
 
 	server := &http.Server{
 		Addr:         ":8080",

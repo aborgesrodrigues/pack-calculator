@@ -10,7 +10,7 @@ start:
 
 .PHONY: support
 support:
-	docker-compose -f $(COMPOSE_FILE) up db
+	docker-compose -f $(COMPOSE_FILE) up -d db
 
 .PHONY: build
 build:
