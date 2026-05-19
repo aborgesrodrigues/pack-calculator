@@ -68,3 +68,26 @@ func (h *Handler) SavePackSize(w http.ResponseWriter, r *http.Request) {
 		h.logger.Error(err.Error())
 	}
 }
+
+func (h *Handler) Calculate(w http.ResponseWriter, r *http.Request) {
+	order := &common.Order{}
+	if err := json.NewDecoder(r.Body).Decode(order); err != nil {
+		h.logger.Error("Unable to decode request body in handler.Calculate", "error", err)
+		writeResponse(w, http.StatusBadRequest, "Payload in the wrong format")
+		return
+	}
+
+	order, err := h.service.Calculate(r.Context(), order)
+	if err != nil {
+		h.logger.Error("Error calculating order", "error", err)
+
+		if err := writeResponse(w, http.StatusInternalServerError, "error calculating order"); err != nil {
+			h.logger.Error(err.Error())
+		}
+		return
+	}
+
+	if err := writeResponse(w, http.StatusOK, order); err != nil {
+		h.logger.Error(err.Error())
+	}
+}

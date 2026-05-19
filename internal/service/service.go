@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"pack-calculator/internal/common"
 	"pack-calculator/internal/db"
+
+	"github.com/google/uuid"
 )
 
 type Service struct {
@@ -15,6 +17,7 @@ type Service struct {
 
 type SVCInterface interface {
 	SavePackSize(context.Context, *common.PackSizeBatch) error
+	Calculate(context.Context, *common.Order) (*common.Order, error)
 }
 
 func NewService(logger *slog.Logger) (*Service, error) {
@@ -42,4 +45,10 @@ func (s *Service) SavePackSize(ctx context.Context, packSizeBatch *common.PackSi
 	}
 
 	return nil
+}
+
+func (s *Service) Calculate(ctx context.Context, order *common.Order) (*common.Order, error) {
+	order.ID = uuid.New()
+
+	return order, nil
 }
