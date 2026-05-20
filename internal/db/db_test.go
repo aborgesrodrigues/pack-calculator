@@ -23,6 +23,8 @@ func testDB(t *testing.T, sqlDB *sql.DB) *DB {
 }
 
 func TestGetPackSizes(t *testing.T) {
+	const getPackSizesQuery = `SELECT COALESCE\(array_agg`
+
 	tests := map[string]struct {
 		rows     *sqlmock.Rows
 		expected []int
@@ -31,6 +33,10 @@ func TestGetPackSizes(t *testing.T) {
 		"success": {
 			rows:     sqlmock.NewRows([]string{"array_agg"}).AddRow("{5000,2000,1000}"),
 			expected: []int{5000, 2000, 1000},
+		},
+		"empty": {
+			rows:     sqlmock.NewRows([]string{"array_agg"}).AddRow("{}"),
+			expected: []int{},
 		},
 		"error": {
 			err: errors.New("some error"),
@@ -43,21 +49,17 @@ func TestGetPackSizes(t *testing.T) {
 			assert.NoError(t, err)
 
 			t.Cleanup(func() { _ = sqlDB.Close() })
+
+			query := mock.ExpectQuery(getPackSizesQuery)
 			if tt.rows != nil {
-				mock.ExpectQuery(`SELECT array_agg`).WillReturnRows(tt.rows)
+				query.WillReturnRows(tt.rows)
 			} else {
-				mock.ExpectQuery(`SELECT array_agg`).WillReturnError(tt.err)
+				query.WillReturnError(tt.err)
 			}
 
 			sizes, err := testDB(t, sqlDB).GetPackSizes(context.Background())
 			assert.Equal(t, tt.err, err)
 			assert.Equal(t, tt.expected, sizes)
-
-			for i, size := range sizes {
-				if size != tt.expected[i] {
-					assert.Equal(t, tt.expected[i], size)
-				}
-			}
 
 			err = mock.ExpectationsWereMet()
 			assert.NoError(t, err)
@@ -142,17 +144,40 @@ func TestSavePackSize(t *testing.T) {
 }
 
 func TestNewDB(t *testing.T) {
-	t.Run("success", func(t *testing.T) {
-		t.Setenv("DB_HOST", "localhost")
-		t.Setenv("POSTGRES_USER", "postgres")
-		t.Setenv("POSTGRES_PASSWORD", "postgres")
-		t.Setenv("POSTGRES_DB", "pack_calculator")
-		t.Setenv("POSTGRES_PORT", "5432")
+	tests := map[string]struct {
+		pingErr error
+		wantErr bool
+	}{
+		"success": {},
+		"database down": {
+			pingErr: errors.New("connection refused"),
+			wantErr: true,
+		},
+	}
 
-		db, err := NewDB(slog.New(slog.DiscardHandler))
-		if err != nil {
-			t.Fatalf("NewDB() error = %v", err)
-		}
-		t.Cleanup(func() { _ = db.db.Close() })
-	})
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			sqlDB, mock, err := sqlmock.New(sqlmock.MonitorPingsOption(true))
+			assert.NoError(t, err)
+
+			t.Cleanup(func() { _ = sqlDB.Close() })
+
+			ping := mock.ExpectPing()
+			if tt.pingErr != nil {
+				ping.WillReturnError(tt.pingErr)
+			}
+
+			db, err := newDBWithConn(slog.New(slog.DiscardHandler), sqlDB)
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, db)
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, db)
+			}
+
+			err = mock.ExpectationsWereMet()
+			assert.NoError(t, err)
+		})
+	}
 }

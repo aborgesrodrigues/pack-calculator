@@ -37,19 +37,22 @@ func NewDB(logger *slog.Logger) (*DB, error) {
 		os.Getenv("POSTGRES_PORT"),
 		"disable", // for production it should be confifured properly
 	)
-	db, err := sql.Open("postgres", connString)
+	sqlDB, err := sql.Open("postgres", connString)
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to database: %w", err)
 	}
 
-	// check if database is up
-	if err := db.Ping(); err != nil {
+	return newDBWithConn(logger, sqlDB)
+}
+
+func newDBWithConn(logger *slog.Logger, sqlDB *sql.DB) (*DB, error) {
+	if err := sqlDB.Ping(); err != nil {
 		return nil, fmt.Errorf("Database is down: %v", err)
 	}
 
 	return &DB{
 		logger: logger,
-		db:     db,
+		db:     sqlDB,
 	}, nil
 }
 
