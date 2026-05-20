@@ -189,7 +189,7 @@ func TestCalculatePacking(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			got := calculate(tt.amount, tt.sizes, make(map[int]int))
+			got := choosePacks(tt.amount, tt.sizes)
 			assert.Equal(t, tt.want, got)
 		})
 	}
