@@ -70,6 +70,10 @@ func (s *Service) Calculate(ctx context.Context, order *common.Order) (*common.O
 
 	order.Packs = packs
 
+	if err := s.db.SaveOrder(ctx, order); err != nil {
+		return nil, fmt.Errorf("error saving order: %v", err)
+	}
+
 	return order, nil
 }
 

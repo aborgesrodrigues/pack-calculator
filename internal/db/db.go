@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -23,6 +24,7 @@ type DBInterface interface {
 	ClearPackSize(context.Context) error
 	SavePackSize(context.Context, *common.PackSizeBatch) error
 	GetPackSizes(context.Context) ([]int, error)
+	SaveOrder(context.Context, *common.Order) error
 }
 
 func NewDB(logger *slog.Logger) (*DB, error) {
@@ -91,6 +93,28 @@ func (db *DB) SavePackSize(ctx context.Context, packSizeBatch *common.PackSizeBa
         	SELECT unnest($1::int[])
 		`,
 		pq.Array(packSizeBatch.Sizes),
+	)
+
+	return err
+}
+
+func (db *DB) SaveOrder(ctx context.Context, order *common.Order) error {
+	packs := order.Packs
+	if packs == nil {
+		packs = map[int]int{}
+	}
+
+	packsJSON, err := json.Marshal(packs)
+	if err != nil {
+		return fmt.Errorf("error marshaling packs: %w", err)
+	}
+
+	_, err = db.db.ExecContext(
+		ctx,
+		`INSERT INTO public."order" (id, amount_items, packs) VALUES ($1, $2, $3::jsonb)`,
+		order.ID,
+		order.AmountItems,
+		packsJSON,
 	)
 
 	return err

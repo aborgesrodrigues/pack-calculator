@@ -16,6 +16,7 @@ type mockDB struct {
 	clearPackSize func(context.Context) error
 	savePackSize  func(context.Context, *common.PackSizeBatch) error
 	getPackSizes  func(context.Context) ([]int, error)
+	saveOrder     func(context.Context, *common.Order) error
 }
 
 func (m *mockDB) ClearPackSize(ctx context.Context) error {
@@ -28,6 +29,10 @@ func (m *mockDB) SavePackSize(ctx context.Context, batch *common.PackSizeBatch) 
 
 func (m *mockDB) GetPackSizes(ctx context.Context) ([]int, error) {
 	return m.getPackSizes(ctx)
+}
+
+func (m *mockDB) SaveOrder(ctx context.Context, order *common.Order) error {
+	return m.saveOrder(ctx, order)
 }
 
 func testService(db *mockDB) *Service {
@@ -124,6 +129,9 @@ func TestCalculate(t *testing.T) {
 			svc := testService(&mockDB{
 				getPackSizes: func(context.Context) ([]int, error) {
 					return tt.packSizes, tt.packSizesErr
+				},
+				saveOrder: func(ctx context.Context, o *common.Order) error {
+					return nil
 				},
 			})
 
