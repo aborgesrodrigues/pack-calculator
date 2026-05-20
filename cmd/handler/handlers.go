@@ -39,6 +39,17 @@ func writeResponse(w http.ResponseWriter, status int, message any) error {
 	return nil
 }
 
+// SavePackSize replaces all configured pack sizes with the given list.
+// @Summary Replace pack sizes
+// @Description Clears existing sizes in the database and inserts the provided list. The sizes array must not be empty.
+// @Tags pack_sizes
+// @Accept json
+// @Produce json
+// @Param request body common.PackSizeBatch true "Pack sizes to use for fulfilment"
+// @Success 200 {string} string "Pack sizes saved"
+// @Failure 400 {string} string "Payload in the wrong format or no sizes passed"
+// @Failure 500 {string} string "error saving pack sizes"
+// @Router /pack_size/batch [post]
 func (h *Handler) SavePackSize(w http.ResponseWriter, r *http.Request) {
 	packSizeBatch := &common.PackSizeBatch{}
 	if err := json.NewDecoder(r.Body).Decode(packSizeBatch); err != nil {
@@ -69,6 +80,17 @@ func (h *Handler) SavePackSize(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Calculate assigns an order id and returns the order payload including a generated event_id.
+// @Summary Calculate packs for an order
+// @Description Accepts the number of items ordered and returns the order including a generated event_id. Pack mix is computed according to business rules.
+// @Tags orders
+// @Accept json
+// @Produce json
+// @Param request body common.Order true "Order payload (items required)"
+// @Success 200 {object} common.Order
+// @Failure 400 {string} string "Payload in the wrong format"
+// @Failure 500 {string} string "error calculating order"
+// @Router /calculate [post]
 func (h *Handler) Calculate(w http.ResponseWriter, r *http.Request) {
 	order := &common.Order{}
 	if err := json.NewDecoder(r.Body).Decode(order); err != nil {

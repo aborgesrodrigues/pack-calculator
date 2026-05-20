@@ -19,3 +19,7 @@ build:
 .PHONY: test
 test:
 	go test -v ./... --race
+
+.PHONY: swagger
+swagger:
+	GOPROXY=https://proxy.golang.org,direct go run github.com/swaggo/swag/cmd/swag@v1.16.4 init -g main.go -o ./docs -d ./cmd,./internal/common --parseInternal

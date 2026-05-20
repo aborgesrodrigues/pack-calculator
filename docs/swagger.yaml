@@ -1,0 +1,95 @@
+basePath: /
+definitions:
+  common.Order:
+    properties:
+      event_id:
+        type: string
+      items:
+        type: integer
+    type: object
+  common.PackSizeBatch:
+    properties:
+      sizes:
+        items:
+          type: integer
+        type: array
+    type: object
+host: localhost:8080
+info:
+  contact:
+    name: API Support
+  description: HTTP API to configure pack sizes and calculate how many packs to ship
+    for an order (whole packs only; minimises items shipped, then pack count).
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Pack Calculator API
+  version: "1.0"
+paths:
+  /calculate:
+    post:
+      consumes:
+      - application/json
+      description: Accepts the number of items ordered and returns the order including
+        a generated event_id. Pack mix is computed according to business rules.
+      parameters:
+      - description: Order payload (items required)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/common.Order'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Order'
+        "400":
+          description: Payload in the wrong format
+          schema:
+            type: string
+        "500":
+          description: error calculating order
+          schema:
+            type: string
+      summary: Calculate packs for an order
+      tags:
+      - orders
+  /pack_size/batch:
+    post:
+      consumes:
+      - application/json
+      description: Clears existing sizes in the database and inserts the provided
+        list. The sizes array must not be empty.
+      parameters:
+      - description: Pack sizes to use for fulfilment
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/common.PackSizeBatch'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pack sizes saved
+          schema:
+            type: string
+        "400":
+          description: Payload in the wrong format or no sizes passed
+          schema:
+            type: string
+        "500":
+          description: error saving pack sizes
+          schema:
+            type: string
+      summary: Replace pack sizes
+      tags:
+      - pack_sizes
+schemes:
+- http
+- https
+swagger: "2.0"
