@@ -101,11 +101,11 @@ func TestSavePackSize(t *testing.T) {
 
 func TestCalculate(t *testing.T) {
 	tests := map[string]struct {
-		order         *common.Order
-		packSizes     []int
-		packSizesErr  error
-		wantErr       bool
-		wantIDNotNil  bool
+		order        *common.Order
+		packSizes    []int
+		packSizesErr error
+		wantErr      bool
+		wantIDNotNil bool
 	}{
 		"success": {
 			order:        &common.Order{AmountItems: 12},
@@ -147,20 +147,35 @@ func TestCalculatePacking(t *testing.T) {
 		sizes  []int
 		want   map[int]int
 	}{
-		"exact fit with largest size": {
-			amount: 10,
-			sizes:  []int{5, 3, 1},
-			want:   map[int]int{5: 2},
+		"amount 1": {
+			amount: 1,
+			sizes:  []int{5000, 2000, 1000, 500, 250},
+			want:   map[int]int{250: 1},
 		},
-		"uses smaller sizes for remainder": {
-			amount: 12,
-			sizes:  []int{5, 3, 1},
-			want:   map[int]int{5: 2, 1: 2},
+		"amount 250": {
+			amount: 250,
+			sizes:  []int{5000, 2000, 1000, 500, 250},
+			want:   map[int]int{250: 1},
 		},
-		"remainder uses smallest pack": {
+		"amount 251": {
+			amount: 251,
+			sizes:  []int{5000, 2000, 1000, 500, 250},
+			want:   map[int]int{500: 1},
+		},
+		"amount 501": {
+			amount: 501,
+			sizes:  []int{5000, 2000, 1000, 500, 250},
+			want:   map[int]int{500: 1, 250: 1},
+		},
+		"amount 12001": {
+			amount: 12001,
+			sizes:  []int{5000, 2000, 1000, 500, 250},
+			want:   map[int]int{5000: 2, 2000: 1, 250: 1},
+		},
+		"amount 500000": {
 			amount: 6,
-			sizes:  []int{5, 3, 1},
-			want:   map[int]int{5: 1, 1: 1},
+			sizes:  []int{23, 31, 53},
+			want:   map[int]int{23: 2, 31: 7, 53: 9429},
 		},
 	}
 
