@@ -64,6 +64,7 @@ func (s *Service) Calculate(ctx context.Context, order *common.Order) (*common.O
 func calculate(amountItems int, sizes []int, used map[int]int) map[int]int {
 	rest := amountItems
 	for _, size := range sizes {
+		// find the first pack size that can support the size
 		if amountItems >= size {
 			used[size] += 1
 			rest -= size
@@ -74,6 +75,7 @@ func calculate(amountItems int, sizes []int, used map[int]int) map[int]int {
 				break
 			}
 
+			// calculate over the rest
 			if rest > 0 {
 				return calculate(rest, sizes, used)
 			}

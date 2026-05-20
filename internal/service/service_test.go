@@ -173,8 +173,8 @@ func TestCalculatePacking(t *testing.T) {
 			want:   map[int]int{5000: 2, 2000: 1, 250: 1},
 		},
 		"amount 500000": {
-			amount: 6,
-			sizes:  []int{23, 31, 53},
+			amount: 500000,
+			sizes:  []int{53, 31, 23},
 			want:   map[int]int{23: 2, 31: 7, 53: 9429},
 		},
 	}
