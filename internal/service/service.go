@@ -16,6 +16,7 @@ type Service struct {
 }
 
 type SVCInterface interface {
+	GetPackSizes(context.Context) (*common.PackSizeBatch, error)
 	SavePackSize(context.Context, *common.PackSizeBatch) error
 	Calculate(context.Context, *common.Order) (*common.Order, error)
 }
@@ -31,6 +32,15 @@ func NewService(logger *slog.Logger) (*Service, error) {
 		logger: logger,
 		db:     db,
 	}, nil
+}
+
+func (s *Service) GetPackSizes(ctx context.Context) (*common.PackSizeBatch, error) {
+	sizes, err := s.db.GetPackSizes(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error get pack sizes: %v", err)
+	}
+
+	return &common.PackSizeBatch{Sizes: sizes}, nil
 }
 
 func (s *Service) SavePackSize(ctx context.Context, packSizeBatch *common.PackSizeBatch) error {

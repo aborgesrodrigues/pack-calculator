@@ -17,8 +17,16 @@ import (
 )
 
 type mockService struct {
+	getPackSizes func(context.Context) (*common.PackSizeBatch, error)
 	savePackSize func(context.Context, *common.PackSizeBatch) error
 	calculate    func(context.Context, *common.Order) (*common.Order, error)
+}
+
+func (m *mockService) GetPackSizes(ctx context.Context) (*common.PackSizeBatch, error) {
+	if m.getPackSizes != nil {
+		return m.getPackSizes(ctx)
+	}
+	return &common.PackSizeBatch{}, nil
 }
 
 func (m *mockService) SavePackSize(ctx context.Context, batch *common.PackSizeBatch) error {

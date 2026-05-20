@@ -55,6 +55,12 @@ make stop
 
 ## API examples (curl)
 
+List configured pack sizes:
+
+```bash
+curl -s http://localhost:8080/pack_size/batch
+```
+
 Configure pack sizes (replaces any existing sizes):
 
 ```bash

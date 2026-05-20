@@ -57,7 +57,7 @@ func (db *DB) GetPackSizes(ctx context.Context) ([]int, error) {
 	if err := db.db.QueryRowContext(
 		ctx,
 		`	
-			SELECT array_agg(size ORDER BY size DESC) FROM pack_size;
+			SELECT COALESCE(array_agg(size ORDER BY size DESC), '{}') FROM pack_size;
 		`,
 	).Scan(pq.Array(&sizes64)); err != nil {
 		return nil, err

@@ -35,6 +35,7 @@ func main() {
 
 	// add routes
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /pack_size/batch", handler.GetPackSizes)
 	mux.HandleFunc("POST /pack_size/batch", handler.SavePackSize)
 	mux.HandleFunc("POST /calculate", handler.Calculate)
 

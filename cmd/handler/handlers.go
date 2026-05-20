@@ -39,6 +39,30 @@ func writeResponse(w http.ResponseWriter, status int, message any) error {
 	return nil
 }
 
+// GetPackSizes returns the pack sizes currently stored in the database.
+// @Summary List pack sizes
+// @Description Returns all configured pack sizes ordered from largest to smallest.
+// @Tags pack_sizes
+// @Produce json
+// @Success 200 {object} common.PackSizeBatch
+// @Failure 500 {string} string "error loading pack sizes"
+// @Router /pack_size/batch [get]
+func (h *Handler) GetPackSizes(w http.ResponseWriter, r *http.Request) {
+	batch, err := h.service.GetPackSizes(r.Context())
+	if err != nil {
+		h.logger.Error("Error loading pack sizes", "error", err)
+
+		if err := writeResponse(w, http.StatusInternalServerError, "error loading pack sizes"); err != nil {
+			h.logger.Error(err.Error())
+		}
+		return
+	}
+
+	if err := writeResponse(w, http.StatusOK, batch); err != nil {
+		h.logger.Error(err.Error())
+	}
+}
+
 // SavePackSize replaces all configured pack sizes with the given list.
 // @Summary Replace pack sizes
 // @Description Clears existing sizes in the database and inserts the provided list. The sizes array must not be empty.
