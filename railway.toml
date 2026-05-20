@@ -1,0 +1,14 @@
+# Railway config for the API service (pack-calculator-api).
+# In the Railway dashboard: api → Settings → Config-as-code → path: railway.toml
+#
+# Do not use Railpack/Nixpacks for this repo; the default Go start command is ./out.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "dev/Dockerfile"
+
+[deploy]
+startCommand = "./pack-calculator"
+healthcheckPath = "/swagger/"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"

@@ -1,0 +1,11 @@
+# Railway config for the UI service (pack-calculator-ui).
+# In the Railway dashboard: ui → Settings → Config-as-code → path: railway.ui.toml
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "dev/ui/Dockerfile.railway"
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 20
+restartPolicyType = "ON_FAILURE"
