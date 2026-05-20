@@ -6,6 +6,10 @@ definitions:
         type: string
       items:
         type: integer
+      packs:
+        additionalProperties:
+          type: integer
+        type: object
     type: object
   common.PackSizeBatch:
     properties:

@@ -9,6 +9,7 @@ type PackSizeBatch struct {
 
 // Order is the request and response shape for pack calculation (event_id is set on success).
 type Order struct {
-	ID          uuid.UUID `json:"event_id"`
-	AmountItems int       `json:"items"`
+	ID          uuid.UUID   `json:"event_id"`
+	AmountItems int         `json:"items"`
+	Packs       map[int]int `json:"packs"`
 }

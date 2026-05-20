@@ -55,8 +55,10 @@ func (s *Service) Calculate(ctx context.Context, order *common.Order) (*common.O
 		return nil, fmt.Errorf("error get pack sizes: %v", err)
 	}
 
-	result := calculate(order.AmountItems, sizes, make(map[int]int))
-	s.logger.Info("Result", "map", result)
+	packs := calculate(order.AmountItems, sizes, make(map[int]int))
+	s.logger.Info("Result", "packs", packs)
+
+	order.Packs = packs
 
 	return order, nil
 }

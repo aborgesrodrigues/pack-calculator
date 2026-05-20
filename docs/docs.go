@@ -124,6 +124,12 @@ const docTemplate = `{
                 },
                 "items": {
                     "type": "integer"
+                },
+                "packs": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
                 }
             }
         },
