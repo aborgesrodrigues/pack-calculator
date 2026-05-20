@@ -20,8 +20,9 @@ type DB struct {
 }
 
 type DBInterface interface {
-	ClearPackSize(ctx context.Context) error
-	SavePackSize(ctx context.Context, packSizeBatch *common.PackSizeBatch) error
+	ClearPackSize(context.Context) error
+	SavePackSize(context.Context, *common.PackSizeBatch) error
+	GetPackSizes(context.Context) ([]int, error)
 }
 
 func NewDB(logger *slog.Logger) (*DB, error) {
@@ -43,6 +44,27 @@ func NewDB(logger *slog.Logger) (*DB, error) {
 		logger: logger,
 		db:     db,
 	}, nil
+}
+
+func (db *DB) GetPackSizes(ctx context.Context) ([]int, error) {
+	var sizes64 []int64
+
+	if err := db.db.QueryRowContext(
+		ctx,
+		`	
+			SELECT array_agg(size ORDER BY size DESC) FROM pack_size;
+		`,
+	).Scan(pq.Array(&sizes64)); err != nil {
+		return nil, err
+	}
+
+	// cast to []int
+	sizes := make([]int, len(sizes64))
+	for i := range sizes {
+		sizes[i] = int(sizes64[i])
+	}
+
+	return sizes, nil
 }
 
 func (db *DB) ClearPackSize(ctx context.Context) error {

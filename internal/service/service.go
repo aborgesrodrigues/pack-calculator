@@ -50,5 +50,40 @@ func (s *Service) SavePackSize(ctx context.Context, packSizeBatch *common.PackSi
 func (s *Service) Calculate(ctx context.Context, order *common.Order) (*common.Order, error) {
 	order.ID = uuid.New()
 
+	sizes, err := s.db.GetPackSizes(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error get pack sizes: %v", err)
+	}
+
+	result := calculate(order.AmountItems, sizes, make(map[int]int))
+	s.logger.Info("Result", "map", result)
+
 	return order, nil
+}
+
+func calculate(amountItems int, sizes []int, used map[int]int) map[int]int {
+	rest := amountItems
+	for _, size := range sizes {
+		if amountItems >= size {
+			used[size] += 1
+			rest -= size
+
+			// if rest is negative means that calculation is done
+			if rest <= 0 {
+				rest = 0
+				break
+			}
+
+			if rest > 0 {
+				return calculate(rest, sizes, used)
+			}
+		}
+	}
+
+	// if there is a rest use the smallest size
+	if rest > 0 {
+		used[sizes[len(sizes)-1]] += 1
+	}
+
+	return used
 }
