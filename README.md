@@ -22,12 +22,14 @@ POSTGRES_PORT=5432
 
 `DB_HOST=db` matches the Docker Compose service name when using `make start`.
 
+Local development assets live under `dev/` (Docker Compose, app Dockerfile, database init script, and the web UI in `dev/ui/`).
+
 ## Run locally (Makefile)
 
 | Command | Description |
 |---------|-------------|
 | `make support` | Start PostgreSQL only (port `5432`) |
-| `make start` | Build and start the app + database (API on port `8080`) |
+| `make start` | Build and start the app, UI, and database (API on `8080`, UI on `8081`) |
 | `make stop` | Stop and remove containers |
 | `make test` | Run tests with the race detector |
 | `make swagger` | Regenerate OpenAPI docs under `docs/` |
@@ -40,6 +42,8 @@ make start
 ```
 
 API base URL: `http://localhost:8080`
+
+Web UI: `http://localhost:8081` (`dev/ui/` — forms for `/pack_size/batch` and `/calculate`)
 
 Swagger UI: `http://localhost:8080/swagger`
 

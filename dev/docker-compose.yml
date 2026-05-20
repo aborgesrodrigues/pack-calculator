@@ -11,6 +11,15 @@ services:
     env_file:
       - ../.env
 
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - 8081:80
+    depends_on:
+      - app
+
   db:
     image: postgres:13-alpine3.18
     restart: always

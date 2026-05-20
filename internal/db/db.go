@@ -40,6 +40,11 @@ func NewDB(logger *slog.Logger) (*DB, error) {
 		return nil, fmt.Errorf("error connecting to database: %w", err)
 	}
 
+	// check if database is up
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("Database is down: %v", err)
+	}
+
 	return &DB{
 		logger: logger,
 		db:     db,

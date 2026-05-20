@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pack Calculator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>Pack Calculator</h1>
+    <p class="subtitle">Configure pack sizes and calculate fulfilment for an order.</p>
+  </header>
+
+  <main class="layout">
+    <section class="card" aria-labelledby="pack-sizes-heading">
+      <h2 id="pack-sizes-heading">Pack sizes</h2>
+      <p class="hint">Replaces all configured sizes. Enter comma-separated integers (e.g. <code>5000,2000,1000,500,250</code>).</p>
+      <form id="pack-form">
+        <label for="pack-sizes">Sizes</label>
+        <input
+          id="pack-sizes"
+          name="sizes"
+          type="text"
+          placeholder="5000, 2000, 1000, 500, 250"
+          value="5000, 2000, 1000, 500, 250"
+          required
+        />
+        <button type="submit">POST /pack_size/batch</button>
+      </form>
+      <div class="response" id="pack-response" hidden>
+        <div class="response-meta">
+          <span class="status" id="pack-status"></span>
+        </div>
+        <pre id="pack-body"></pre>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="calculate-heading">
+      <h2 id="calculate-heading">Calculate order</h2>
+      <p class="hint">Returns <code>event_id</code>, <code>items</code>, and <code>packs</code> for the order.</p>
+      <form id="calculate-form">
+        <label for="items">Items ordered</label>
+        <input
+          id="items"
+          name="items"
+          type="number"
+          min="1"
+          placeholder="12001"
+          value="12001"
+          required
+        />
+        <button type="submit">POST /calculate</button>
+      </form>
+      <div class="response" id="calculate-response" hidden>
+        <div class="response-meta">
+          <span class="status" id="calculate-status"></span>
+        </div>
+        <pre id="calculate-body"></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a href="http://localhost:8080/swagger" target="_blank" rel="noopener">API docs (Swagger)</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
