@@ -1,6 +1,6 @@
 # Pack Calculator
 
-HTTP API to configure pack sizes and calculate how many packs to ship for an order. See [coding_challenge.md](coding_challenge.md) for the business rules.
+HTTP API to configure pack sizes and calculate how many packs to ship for an order.
 
 ## Prerequisites
 
