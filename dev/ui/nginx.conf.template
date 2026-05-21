@@ -12,16 +12,16 @@ server {
     }
 
     location /pack_size/ {
-        set $api_backend "${API_UPSTREAM}";
-        proxy_pass http://$api_backend/pack_size/;
+        set $api_upstream "http://${API_UPSTREAM}";
+        proxy_pass $api_upstream$request_uri;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
 
     location /calculate {
-        set $api_backend "${API_UPSTREAM}";
-        proxy_pass http://$api_backend/calculate;
+        set $api_upstream "http://${API_UPSTREAM}";
+        proxy_pass $api_upstream$request_uri;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
