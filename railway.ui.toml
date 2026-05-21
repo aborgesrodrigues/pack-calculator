@@ -3,7 +3,7 @@
 
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "dev/ui/Dockerfile.railway"
+dockerfilePath = "dev/ui/Dockerfile"
 
 [deploy]
 healthcheckPath = "/"
