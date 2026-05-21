@@ -4,19 +4,24 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    # Dynamic resolve (required when proxy_pass uses a variable).
+    resolver ${NGINX_RESOLVER};
+
     location / {
         try_files $uri $uri/ /index.html;
     }
 
     location /pack_size/ {
-        proxy_pass http://app:8080/pack_size/;
+        set $api_backend "${API_UPSTREAM}";
+        proxy_pass http://$api_backend/pack_size/;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
 
     location /calculate {
-        proxy_pass http://app:8080/calculate;
+        set $api_backend "${API_UPSTREAM}";
+        proxy_pass http://$api_backend/calculate;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
